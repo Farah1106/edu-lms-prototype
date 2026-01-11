@@ -1,0 +1,8 @@
+POST https://lms-bab6hkcxgwh2g6cm.centralindia-01.azurewebsites.net/courses
+Content-Type: application/json
+
+{
+  "title": "Advanced Azure Prototypes",
+  "educator": "Your Name",
+  "role": "Educator"
+}
