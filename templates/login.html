@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LMS Login</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #eee; }
+        form { background: white; padding: 30px; border-radius: 8px; }
+        input, select, button { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+    </style>
+</head>
+<body>
+    <form action="/login" method="post">
+        <h2>LMS Login</h2>
+        <input type="text" name="username" placeholder="Username" required>
+        <select name="role">
+            <option value="Learner">Learner (Student)</option>
+            <option value="Educator">Educator (Instructor)</option>
+        </select>
+        <button type="submit" style="background: #0078d4; color: white; border: none;">Login</button>
+    </form>
+</body>
+</html>

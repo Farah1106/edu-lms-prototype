@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - {{ role }}</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .course-list { border-top: 1px solid #ccc; margin-top: 20px; }
+        .course-item { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .educator-panel { background: #e7f3ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>LMS Portal</h1>
+    <p>Logged in as: <strong>{{ session['user'] }}</strong> ({{ role }}) | <a href="/logout">Logout</a></p>
+
+    {% if role == 'Educator' %}
+    <div class="educator-panel">
+        <h3>Educator Tools: Create Course</h3>
+        <form action="/course/add" method="post">
+            <input type="text" name="title" placeholder="Course Title" required>
+            <input type="text" name="description" placeholder="Description">
+            <button type="submit">Add Course</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="course-list">
+        <h3>Available Courses</h3>
+        {% for course in courses %}
+        <div class="course-item">
+            <div>
+                <strong>{{ course[1] }}</strong><br>
+                <small>Instructor: {{ course[3] }}</small>
+            </div>
+            
+            {% if role == 'Educator' %}
+            <div style="display: flex; gap: 5px;">
+                <form action="/course/update/{{ course[0] }}" method="post">
+                    <input type="text" name="title" placeholder="New Title" size="10">
+                    <button type="submit">Update</button>
+                </form>
+                <form action="/course/delete/{{ course[0] }}" method="post">
+                    <button type="submit" style="color: red;">Delete</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
