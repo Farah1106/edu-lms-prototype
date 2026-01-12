@@ -1,22 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>LMS Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Login | Edu Fairuzullah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #eee; }
-        form { background: white; padding: 30px; border-radius: 8px; }
-        input, select, button { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+        body { 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+        }
+        .login-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .login-header {
+            background: #0078d4;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #0078d4;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #005a9e;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #0078d4;
+            box-shadow: 0 0 0 0.25 row rgba(0, 120, 212, 0.25);
+        }
     </style>
 </head>
 <body>
-    <form action="/login" method="post">
-        <h2>LMS Login</h2>
-        <input type="text" name="username" placeholder="Username" required>
-        <select name="role">
-            <option value="Learner">Learner (Student)</option>
-            <option value="Educator">Educator (Instructor)</option>
-        </select>
-        <button type="submit" style="background: #0078d4; color: white; border: none;">Login</button>
-    </form>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="card login-card">
+                <div class="login-header">
+                    <i class="fas fa-user-circle fa-3x mb-2"></i>
+                    <h3 class="fw-bold mb-0">Portal Login</h3>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-center text-muted small mb-4">Enter your credentials to access the LMS</p>
+                    
+                    <form action="/login" method="post">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-uppercase">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
+                                <input type="text" name="username" class="form-control border-start-0" placeholder="e.g. farah1106" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-uppercase">Access Role</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-user-tag text-muted"></i></span>
+                                <select name="role" class="form-select border-start-0">
+                                    <option value="Learner">Learner (Student)</option>
+                                    <option value="Educator">Educator (Instructor)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 shadow-sm mb-3">
+                            Login to Dashboard <i class="fas fa-sign-in-alt ms-2"></i>
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <a href="/" class="text-decoration-none small text-muted"><i class="fas fa-arrow-left me-1"></i> Back to Home</a>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center mt-4 text-muted small">&copy; 2026 Edu Fairuzullah Sdn Bhd</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
