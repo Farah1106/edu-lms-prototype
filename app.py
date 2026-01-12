@@ -4,19 +4,22 @@ import os
 from functools import wraps
 
 app = Flask(__name__)
+# Secret key for session security
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "your_development_secret_key")
 
 # --- DATABASE CONNECTION ---
 def get_db_connection():
+    # Ensure this matches your Azure App Service Environment Variable
     conn_str = os.getenv("SQL_CONNECTION_STRING")
     try:
+        # Using ODBC Driver 17 for standard Azure compatibility
         conn = pyodbc.connect(conn_str)
         return conn
     except Exception as e:
         print(f"Database Connection Error: {e}")
         return None
 
-# --- AUTHENTICATION DECORATORS ---
+# --- AUTHENTICATION DECORATORS (Question 2b) ---
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -28,6 +31,7 @@ def login_required(f):
 def educator_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # Checks the UserRole retrieved from your Users table
         if session.get('role') != 'Educator':
             return "Access Denied: Educator role required.", 403
         return f(*args, **kwargs)
@@ -42,24 +46,40 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        session['user'] = request.form['username']
-        session['role'] = request.form['role']
-        return redirect(url_for('dashboard'))
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        conn = get_db_connection()
+        if not conn:
+            return "Database Error.", 500
+            
+        cursor = conn.cursor()
+        # Verifying against your real Users table
+        cursor.execute("SELECT Username, UserRole FROM Users WHERE Username = ? AND Password = ?", 
+                       (username, password))
+        user = cursor.fetchone()
+        conn.close()
+
+        if user:
+            session['user'] = user[0]
+            session['role'] = user[1]
+            return redirect(url_for('dashboard'))
+        else:
+            return "Invalid login credentials.", 401
+            
     return render_template('login.html')
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
     conn = get_db_connection()
-    if not conn:
-        return "Database connection failed.", 500
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Courses")
     courses = cursor.fetchall()
     conn.close()
     return render_template('dashboard.html', courses=courses, role=session['role'])
 
-# --- CRUD OPERATIONS ---
+# --- CRUD OPERATIONS (Question 2a) ---
 
 @app.route('/course/add', methods=['POST'])
 @login_required
@@ -84,7 +104,7 @@ def update_course(id):
         new_title = request.form['title']
         conn = get_db_connection()
         cursor = conn.cursor()
-        # FIX: Using 'CourseID' to match your database schema
+        # Updated to use 'CourseID' to match your database
         cursor.execute("UPDATE Courses SET Title = ? WHERE CourseID = ?", (new_title, id))
         conn.commit()
         conn.close()
@@ -99,7 +119,7 @@ def delete_course(id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        # FIX: Using 'CourseID' and the tuple format (id,)
+        # Updated to use 'CourseID' and correct tuple
         cursor.execute("DELETE FROM Courses WHERE CourseID = ?", (id,))
         conn.commit()
         conn.close()
