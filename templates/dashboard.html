@@ -5,62 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LMS Dashboard | {{ role }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #f0f2f5; }
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .navbar { background-color: #0078d4; border-bottom: 3px solid #005a9e; }
-        .course-card { border: none; border-radius: 10px; transition: transform 0.2s; }
-        .course-card:hover { transform: translateY(-5px); }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .course-card { transition: transform 0.2s; border-left: 5px solid #0078d4; }
+        .course-card:hover { transform: scale(1.01); }
+        .btn-outline-danger:hover { color: white; }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-dark shadow-sm mb-4">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="#">Edu Fairuzullah LMS</a>
-        <div class="text-white">
-            <span class="me-3">Hello, <strong>{{ session['user'] }}</strong> ({{ role }})</span>
-            <a href="/logout" class="btn btn-sm btn-outline-light">Logout</a>
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-graduation-cap me-2"></i>Edu Fairuzullah LMS</a>
+        <div class="d-flex align-items-center text-white">
+            <span class="me-3 small">Logged in as: <strong>{{ session['user'] }}</strong> ({{ role }})</span>
+            <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
         </div>
     </div>
 </nav>
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-4">
+        <div class="col-lg-4 mb-4">
             {% if role == 'Educator' %}
-            <div class="card p-4 shadow-sm mb-4 border-primary border-top border-4">
-                <h4 class="text-primary mb-3">Add New Course</h4>
+            <div class="card p-4 border-top border-primary border-4">
+                <h4 class="fw-bold text-primary mb-3">Add New Course</h4>
                 <form action="/course/add" method="POST">
-                    <input type="text" name="title" class="form-control mb-2" placeholder="Title" required>
-                    <textarea name="description" class="form-control mb-3" placeholder="Description"></textarea>
-                    <button type="submit" class="btn btn-primary w-100">Create</button>
+                    <div class="mb-3">
+                        <input type="text" name="title" class="form-control" placeholder="Course Title (e.g. Science)" required>
+                    </div>
+                    <div class="mb-3">
+                        <textarea name="description" class="form-control" placeholder="Short Description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Create Course</button>
                 </form>
             </div>
             {% else %}
-            <div class="alert alert-info shadow-sm">
-                Welcome, Learner! You can view and join available classes below.
+            <div class="card p-4 bg-primary text-white text-center">
+                <h5>Welcome, Learner!</h5>
+                <p class="small mb-0">Browse and join the available courses managed by our Educators.</p>
             </div>
             {% endif %}
         </div>
 
         <div class="col-lg-8">
-            <h3 class="mb-4">Available Courses</h3>
+            <h3 class="fw-bold mb-4">Available Courses</h3>
+            
             {% for course in courses %}
-            <div class="card course-card shadow-sm p-3 mb-3">
+            <div class="card course-card p-3 mb-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="fw-bold text-primary mb-1">{{ course[1] }}</h5>
-                        <p class="text-muted small mb-0">Educator: {{ course[2] }}</p>
+                        <h5 class="fw-bold text-dark mb-1">{{ course[1] }}</h5>
+                        <p class="text-muted mb-0 small"><i class="fas fa-user-tie me-1"></i> Educator: {{ course[2] }}</p>
                     </div>
+                    
                     <div class="d-flex gap-2">
                         {% if role == 'Educator' %}
-                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#edit-{{ course[0] }}">
+                        <button class="btn btn-sm btn-outline-secondary px-3" data-bs-toggle="collapse" data-bs-target="#edit-{{ course[0] }}">
                             <i class="fas fa-edit"></i> Update
                         </button>
-                        <form action="{{ url_for('delete_course', id=course[0]) }}" method="POST">
-                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete course?')">
-                                <i class="fas fa-trash"></i>
+                        
+                        <form action="{{ url_for('delete_course', id=course[0]) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-danger px-3" onclick="return confirm('Confirm delete this course?')">
+                                <i class="fas fa-trash-alt"></i> Delete
                             </button>
                         </form>
                         {% else %}
@@ -70,15 +80,23 @@
                 </div>
 
                 <div class="collapse mt-3" id="edit-{{ course[0] }}">
-                    <div class="bg-light p-3 rounded">
+                    <div class="bg-light p-3 rounded shadow-sm border">
+                        <h6 class="small fw-bold text-muted mb-2">Rename Course:</h6>
                         <form action="{{ url_for('update_course', id=course[0]) }}" method="POST" class="input-group">
-                            <input type="text" name="title" class="form-control" placeholder="New Course Title" required>
-                            <button type="submit" class="btn btn-success">Save</button>
+                            <input type="text" name="title" class="form-control" value="{{ course[1] }}" required>
+                            <button type="submit" class="btn btn-success px-4">Save Changes</button>
                         </form>
                     </div>
                 </div>
             </div>
             {% endfor %}
+            
+            {% if not courses %}
+            <div class="text-center py-5">
+                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No courses found in the database.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
