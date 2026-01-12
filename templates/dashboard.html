@@ -8,13 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
     <style>
         body { background-color: #f8f9fa; }
-        .navbar { background-color: #0078d4; } /* Azure Blue Theme */
+        .navbar { background-color: #0078d4; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); }
-        .btn-primary { background-color: #0078d4; border: none; }
         .educator-badge { background-color: #e1f0ff; color: #005a9e; font-weight: bold; }
-        .btn-update { color: #6c757d; border-color: #6c757d; }
-        .btn-update:hover { background-color: #6c757d; color: white; }
     </style>
 </head>
 <body>
@@ -39,21 +35,16 @@
                 <form action="/course/add" method="post">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Course Title</label>
-                        <input type="text" name="title" class="form-control" placeholder="e.g. Data Science 101" required>
+                        <input type="text" name="title" class="form-control" placeholder="Course Name" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Description</label>
-                        <textarea name="description" class="form-control" rows="2" placeholder="Briefly describe the course..."></textarea>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 shadow-sm">Publish Course</button>
                 </form>
             </div>
             {% endif %}
-            
-            <div class="card p-4">
-                <h5 class="fw-bold"><i class="fas fa-info-circle me-2 text-info"></i>Quick Tip</h5>
-                <p class="text-muted small">As an <strong>{{ role }}</strong>, you have specific permissions to manage or view course content tailored to your role.</p>
-            </div>
         </div>
 
         <div class="col-lg-8">
@@ -65,7 +56,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="fw-bold text-primary mb-1">{{ course[1] }}</h5>
-                                <p class="text-muted mb-0 small"><i class="fas fa-user-tie me-2"></i>Instructor: {{ course[3] }}</p>
+                                <p class="text-muted mb-0 small"><i class="fas fa-user-tie me-2"></i>{{ course[3] }}</p>
                             </div>
                             
                             <div class="d-flex gap-2">
@@ -74,7 +65,7 @@
                                         <i class="fas fa-edit me-1"></i> Update
                                     </button>
                                     
-                                    <form action="/course/delete/{{ course[0] }}" method="post" onsubmit="return confirm('Confirm deletion of this course?');">
+                                    <form action="{{ url_for('delete_course', id=course[0]) }}" method="POST" onsubmit="return confirm('Confirm deletion?');">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">
                                             <i class="fas fa-trash me-1"></i> Delete
                                         </button>
@@ -87,9 +78,9 @@
 
                         <div class="collapse mt-3" id="edit-{{ course[0] }}">
                             <div class="bg-light p-3 rounded">
-                                <form action="/course/update/{{ course[0] }}" method="post" class="input-group">
-                                    <input type="text" name="title" class="form-control form-control-sm" placeholder="Enter new title..." required>
-                                    <button type="submit" class="btn btn-sm btn-success px-3">Save Changes</button>
+                                <form action="{{ url_for('update_course', id=course[0]) }}" method="POST" class="input-group">
+                                    <input type="text" name="title" class="form-control form-control-sm" placeholder="New Title" required>
+                                    <button type="submit" class="btn btn-sm btn-success px-3">Save</button>
                                 </form>
                             </div>
                         </div>

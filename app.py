@@ -1,15 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session
 import pyodbc
 import os
 from functools import wraps
 
 app = Flask(__name__)
-# Securely fetch secret key from Azure Environment Variables
+# Fetches the secret key from your Azure Environment Variables
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "your_development_secret_key")
 
 # --- DATABASE CONNECTION ---
 def get_db_connection():
-    # Fetches the connection string you set in Azure Configuration
+    # Uses the SQL_CONNECTION_STRING defined in Azure Configuration
     conn_str = os.getenv("SQL_CONNECTION_STRING")
     try:
         conn = pyodbc.connect(conn_str)
@@ -31,7 +31,7 @@ def educator_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get('role') != 'Educator':
-            # Role-Based Access Control (RBAC) implementation
+            # Role-Based Access Control implementation
             return "Access Denied: Educator role required.", 403
         return f(*args, **kwargs)
     return decorated_function
@@ -45,10 +45,8 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        role = request.form['role']
-        session['user'] = username
-        session['role'] = role
+        session['user'] = request.form['username']
+        session['role'] = request.form['role']
         return redirect(url_for('dashboard'))
     return render_template('login.html')
 
@@ -57,11 +55,11 @@ def login():
 def dashboard():
     conn = get_db_connection()
     if not conn:
-        return "Database connection failed. Check Azure Environment Variables.", 500
+        return "Database connection failed. Please check Azure Networking settings.", 500
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Courses")
     courses = cursor.fetchall()
-    conn.close() # Always close connection to prevent leaks
+    conn.close() # Prevents database connection leaks
     return render_template('dashboard.html', courses=courses, role=session['role'])
 
 # --- CRUD OPERATIONS (Question 2a: 10 Marks) ---
@@ -73,7 +71,6 @@ def add_course():
     title = request.form['title']
     description = request.form.get('description', '')
     educator = session['user']
-    
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO Courses (Title, Description, Educator) VALUES (?, ?, ?)", 
@@ -89,7 +86,7 @@ def update_course(id):
     new_title = request.form['title']
     conn = get_db_connection()
     cursor = conn.cursor()
-    # FIX: The ID must be passed as (id,) to be a proper tuple
+    # Critical Fix: (new_title, id) tuple ensures correct SQL execution
     cursor.execute("UPDATE Courses SET Title = ? WHERE id = ?", (new_title, id))
     conn.commit()
     conn.close()
@@ -101,7 +98,7 @@ def update_course(id):
 def delete_course(id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    # FIX: The ID must be passed as (id,) to be a proper tuple
+    # Critical Fix: (id,) tuple with trailing comma is required for single parameters
     cursor.execute("DELETE FROM Courses WHERE id = ?", (id,))
     conn.commit()
     conn.close()
@@ -113,5 +110,5 @@ def logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    # Compatibility for Azure App Service Port 8000
+    # Azure App Service default port compatibility
     app.run(host='0.0.0.0', port=8000)
